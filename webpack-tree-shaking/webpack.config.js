@@ -5,28 +5,20 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 //清单文件插件，生成manifest.json文件，该文件中包含src中的文件与dist中生成文件的映射关系
 const ManifestPlugin = require('webpack-manifest-plugin');
-//
-const webpack = require('webpack');
 
-//使用了 webpack-dev-middleware 而没有使用 webpack-dev-server，请使用 webpack-hot-middleware package 包，以在你的自定义服务或应用程序上启用 HMR
+/**
+  删除未使用的代码，压缩文件体积
+    1.使用 ES2015 模块语法（即 import 和 export）。
+    2.引入一个能够删除未引用代码(dead code)的压缩工具(minifier)（例如 UglifyJSPlugin）
+*/
+
+//删除未引用代码 npm install --save-dev uglifyjs-webpack-plugin
+//还可以使用其他工具如 webpack-rollup-loader 或 Babel Minify Webpack Plugin，
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
   entry:{
-  	app:'./src/index.js',
-  },
-   devtool: 'inline-source-map',//不要用户生产环境中，主要在开发环境中定位错误。
-  //告知 webpack-dev-server，在 localhost:8080 下建立服务，将 dist 目录下的文件，作为可访问文件。
-  devServer: {
-     contentBase: './dist',
-     hot: true
-  },
-  module: {
-    rules: [
-       {
-         test: /\.css$/,
-         use: ['style-loader', 'css-loader']
-       }
-     ]
+  	app:'./src/index.js'
   },
   plugins: [
      //清单文件
@@ -35,10 +27,9 @@ module.exports = {
      new CleanWebpackPlugin(['dist']),
      //每次生成新的html文件替换掉旧的html文件。解决改变入口，html中文件名不变问题。
      new HtmlWebpackPlugin({
-       title: 'Hot Module Replacement'
+       title: 'Output Management'
      }),
-      new webpack.NamedModulesPlugin(),
-      new webpack.HotModuleReplacementPlugin()
+     new UglifyJSPlugin() //删除未引用代码
    ],
   output: {
     filename: '[name].bundle.js',
